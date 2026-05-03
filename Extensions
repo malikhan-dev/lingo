@@ -1,0 +1,138 @@
+package Lingo
+
+func FindByPredicate[T any](items []T, predicate func(T) bool) *[]T {
+
+	var result []T
+
+	for _, v := range items {
+		if predicate(v) {
+			result = append(result, v)
+		}
+	}
+	return &result
+
+}
+
+func FindFirstByPredicate[T any](items []T, predicate func(T) bool) *T {
+
+	var result T
+
+	for _, v := range items {
+		if predicate(v) {
+			result = v
+		}
+	}
+
+	return &result
+}
+
+func RemoveFirstByPredicate[T any](items []T, predicate func(T) bool) *[]T {
+
+	var result []T
+
+	conditionMet := false
+
+	for _, v := range items {
+
+		if predicate(v) && !conditionMet {
+			conditionMet = true
+			continue
+
+		} else {
+
+			result = append(result, v)
+
+		}
+
+	}
+
+	return &result
+}
+
+func RemoveByPredicate[T any](items []T, predicate func(T) bool) *[]T {
+
+	var result []T
+
+	for _, v := range items {
+		if predicate(v) {
+			continue
+		} else {
+			result = append(result, v)
+		}
+
+	}
+
+	return &result
+}
+
+func Filter[T any](items []T, predicate func(T) bool) *[]T {
+
+	var result []T
+
+	for _, v := range items {
+		if predicate(v) {
+
+			result = append(result, v)
+		}
+
+	}
+	return &result
+}
+
+func FilterFirst[T any](items []T, predicate func(T) bool) *T {
+
+	var result []T
+	result = make([]T, 0)
+
+	for _, v := range items {
+		if predicate(v) {
+			result = append(result, v)
+		}
+	}
+	return &result[0]
+}
+
+func CopyToSlice[T any](items []T) *[]T {
+
+	destination := make([]T, len(items))
+
+	destIndex := 0
+
+	for _, v := range items {
+		destination[destIndex] = v
+		destIndex++
+	}
+
+	return &destination
+}
+
+func ToSlice[k int | float64 | float32 | int16 | int32 | uint | int64, v any](item map[k]v) *[]v {
+
+	var destinationSlice []v
+
+	destIndex := 0
+
+	destinationSlice = make([]v, len(item))
+
+	for _, val := range item {
+		destinationSlice[destIndex] = val
+		destIndex++
+	}
+	return &destinationSlice
+
+}
+
+func Any[T any](Items []T, Condition func(T) bool) bool {
+
+	for _, v := range Items {
+
+		if Condition(v) {
+			return true
+		}
+	}
+	return false
+}
+
+func AnyNot[T any](Items []T, Condition func(T) bool) bool {
+	return !Any(Items, Condition)
+}
