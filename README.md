@@ -31,7 +31,8 @@ As Of Now Lingo Is A Set Of Functions or Extensions That Can Help You Querying D
 4- CopyToSlice
 
   var dest *[]ComplexObjectToSearch
-	dest = CopyToSlice(items)
+  
+  dest = CopyToSlice(items)
 
 5- FilterFirst
 
