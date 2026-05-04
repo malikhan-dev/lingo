@@ -1,6 +1,8 @@
 package lingo
 
-import "reflect"
+import (
+	"reflect"
+)
 
 func FindByPredicate[T any](items []T, predicate func(T) bool) *[]T {
 
@@ -68,18 +70,21 @@ func RemoveByPredicate[T any](items []T, predicate func(T) bool) *[]T {
 	return &result
 }
 
-func Filter[T any](items []T, predicate func(T) bool) *[]T {
+func Where[T any](items []T, predicate func(T) bool) *Queryable[T] {
 
 	var result []T
 
+	var out Queryable[T]
 	for _, v := range items {
 		if predicate(v) {
-
 			result = append(result, v)
 		}
-
 	}
-	return &result
+	out.Items = result
+
+	out.err = nil
+
+	return &out
 }
 
 func FilterFirst[T any](items []T, predicate func(T) bool) *T {
@@ -136,14 +141,71 @@ func Any[T any](Items []T, Condition func(T) bool) bool {
 	return false
 }
 
-func Predicate[T any, v comparable](items []T, name string, value v) []T {
+func Query[T any, v comparable](items Queryable[T], name string, value v) *Queryable[T] {
 
-	fnc := func(t []T) []T {
+	return WhereEx(items.Items, name, value)
+}
+
+func From[T any](items []T) *Queryable[T] {
+
+	return &Queryable[T]{
+		Items: items,
+		err:   nil,
+	}
+}
+
+func (query *Queryable[T]) Where(fieldName string, fieldValue any) *Queryable[T] {
+
+	fnc := func(t *Queryable[T]) *Queryable[T] {
+
+		var Out Queryable[T]
 
 		str_type := reflect.TypeFor[T]()
 
 		if str_type.Kind() != reflect.Struct {
-			panic("cant predicate on a non struct type")
+			/*panic("cant predicate on a non struct type")*/
+		}
+
+		if str_type.Kind() == reflect.Ptr {
+			str_type = str_type.Elem()
+		}
+
+		_, ok := str_type.FieldByName(fieldName)
+
+		newItems := make([]T, 0)
+
+		if ok {
+
+			for _, val := range query.Items {
+
+				v := reflect.ValueOf(val)
+
+				f := v.FieldByName(fieldName)
+
+				if f.Interface() == fieldValue {
+					newItems = append(newItems, val)
+				}
+			}
+
+		} else {
+			/*panic("invalid property name")*/
+		}
+		Out.Items = newItems
+		return &Out
+	}
+
+	return fnc(query)
+}
+func WhereEx[T any, v comparable](items []T, name string, value v) *Queryable[T] {
+
+	fnc := func(t []T) *Queryable[T] {
+
+		var Out Queryable[T]
+
+		str_type := reflect.TypeFor[T]()
+
+		if str_type.Kind() != reflect.Struct {
+			/*panic("cant predicate on a non struct type")*/
 		}
 
 		if str_type.Kind() == reflect.Ptr {
@@ -168,18 +230,50 @@ func Predicate[T any, v comparable](items []T, name string, value v) []T {
 			}
 
 		} else {
-			panic("invalid property name")
+			/*panic("invalid property name")*/
 		}
-		return newItems
+		Out.Items = newItems
+		return &Out
 	}
 
 	return fnc(items)
 
 }
 
-func First[T any](Items []T) T {
+func FirstOrDefault[T any](items *Queryable[T]) *T {
 
-	return Items[0]
+	var result T
+
+	if len(items.Items) > 0 {
+
+		result = items.Items[0]
+
+	}
+	return &result
+}
+
+func All[T any](items *Queryable[T]) *[]T {
+	if len(items.Items) > 0 {
+		return &items.Items
+	} else {
+		panic("index out of range")
+	}
+}
+
+func AllOrDefault[T any](items *Queryable[T]) *[]T {
+	if len(items.Items) > 0 {
+		return &items.Items
+	} else {
+		panic("index out of range")
+	}
+}
+
+func First[T any](items *Queryable[T]) *T {
+	if len(items.Items) > 0 {
+		return &items.Items[0]
+	} else {
+		panic("index out of range")
+	}
 }
 
 func AnyNot[T any](Items []T, Condition func(T) bool) bool {
