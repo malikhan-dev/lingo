@@ -15,7 +15,7 @@ Fast Development
 Integrated Set Of Tools
 
 
-Our Benchmark Shows The Following Lines Of Code Took About 8 seconds To Run In A Slice Of 50,000,000 records. And Results Were As Expected. It Sounds Reasonable.
+Our Benchmark Shows The Following Lines Of Code Took About 4.8 seconds To Run In A Slice Of 50,000,000 records. And The Data Validates. The Performance Looks Solid.
 	
 	Benchmark Pc Specs:
 	Laptop 
@@ -23,7 +23,9 @@ Our Benchmark Shows The Following Lines Of Code Took About 8 seconds To Run In A
 	16Gb Of Ram
 	SSD
 	Linux Ubuntu
-    8 Seconds
+    8 Seconds < 1.3.0
+	4.8 Seconds On Latest Version
+	
 The Benchmark Included In The Test File
 
 
