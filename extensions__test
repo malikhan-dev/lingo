@@ -260,3 +260,35 @@ func TestAny(t *testing.T) {
 	}
 
 }
+
+func Test_Should_Return_Errors(t *testing.T) {
+	result, err := First(From(items).Where("NNNNAAAMMMEEE", 12).Where("FLLLAAAGGGG", "trvue"))
+	if err == nil {
+		t.Error("Error Collector Malfunction")
+	} else {
+		if result != nil {
+			t.Error("Error Collector Malfunction")
+		}
+
+		if len(err) < 3 {
+			t.Error("Error Collector Malfunction")
+		}
+
+		fmt.Println(err)
+	}
+
+	result2, err2 := First(From(items).Where("Name", 12).Where("Flag", true))
+	if err2 == nil {
+		t.Error("Error Collector Malfunction")
+	} else {
+		fmt.Println(result2, err2)
+	}
+
+	result3, err3 := First(From(items).Where("Name", "Jane").Where("Flag", true))
+	if err3 != nil {
+		t.Error("Error Collector Malfunction")
+	} else {
+		fmt.Println(*result3, err3)
+	}
+
+}
