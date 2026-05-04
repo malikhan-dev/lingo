@@ -1,6 +1,7 @@
 package lingo
 
 import (
+	"errors"
 	"reflect"
 )
 
@@ -70,23 +71,6 @@ func RemoveByPredicate[T any](items []T, predicate func(T) bool) *[]T {
 	return &result
 }
 
-func Where[T any](items []T, predicate func(T) bool) *Queryable[T] {
-
-	var result []T
-
-	var out Queryable[T]
-	for _, v := range items {
-		if predicate(v) {
-			result = append(result, v)
-		}
-	}
-	out.Items = result
-
-	out.err = nil
-
-	return &out
-}
-
 func (items Queryable[T]) Filter(predicate func(T) bool) *Queryable[T] {
 
 	var result []T
@@ -144,11 +128,6 @@ func Any[T any](Items []T, Condition func(T) bool) bool {
 	return false
 }
 
-func Query[T any, v comparable](items Queryable[T], name string, value v) *Queryable[T] {
-
-	return WhereEx(items.Items, name, value)
-}
-
 func From[T any](items []T) *Queryable[T] {
 
 	return &Queryable[T]{
@@ -166,7 +145,7 @@ func (query *Queryable[T]) Where(fieldName string, fieldValue any) *Queryable[T]
 		str_type := reflect.TypeFor[T]()
 
 		if str_type.Kind() != reflect.Struct {
-			/*panic("cant predicate on a non struct type")*/
+			Out.err = append(Out.err, errors.New("Expected a struct"))
 		}
 
 		if str_type.Kind() == reflect.Ptr {
@@ -191,7 +170,7 @@ func (query *Queryable[T]) Where(fieldName string, fieldValue any) *Queryable[T]
 			}
 
 		} else {
-			/*panic("invalid property name")*/
+			Out.err = append(Out.err, errors.New("Invalid Property Name"))
 		}
 		Out.Items = newItems
 		return &Out
@@ -199,83 +178,45 @@ func (query *Queryable[T]) Where(fieldName string, fieldValue any) *Queryable[T]
 
 	return fnc(query)
 }
-func WhereEx[T any, v comparable](items []T, name string, value v) *Queryable[T] {
 
-	fnc := func(t []T) *Queryable[T] {
-
-		var Out Queryable[T]
-
-		str_type := reflect.TypeFor[T]()
-
-		if str_type.Kind() != reflect.Struct {
-			/*panic("cant predicate on a non struct type")*/
-		}
-
-		if str_type.Kind() == reflect.Ptr {
-			str_type = str_type.Elem()
-		}
-
-		_, ok := str_type.FieldByName(name)
-
-		newItems := make([]T, 0)
-
-		if ok {
-
-			for _, val := range items {
-
-				v := reflect.ValueOf(val)
-
-				f := v.FieldByName(name)
-
-				if f.Interface() == value {
-					newItems = append(newItems, val)
-				}
-			}
-
-		} else {
-			/*panic("invalid property name")*/
-		}
-		Out.Items = newItems
-		return &Out
-	}
-
-	return fnc(items)
-
-}
-
-func FirstOrDefault[T any](items *Queryable[T]) *T {
+func FirstOrDefault[T any](items *Queryable[T]) (*T, []error) {
 
 	var result T
 
 	if len(items.Items) > 0 {
-
 		result = items.Items[0]
-
+	} else {
+		items.err = append(items.err, errors.New("No items found"))
 	}
-	return &result
+	return &result, items.err
 }
 
-func All[T any](items *Queryable[T]) *[]T {
+func All[T any](items *Queryable[T]) (*[]T, []error) {
 	if len(items.Items) > 0 {
-		return &items.Items
+		return &items.Items, items.err
 	} else {
-		panic("index out of range")
-	}
-}
-
-func AllOrDefault[T any](items *Queryable[T]) *[]T {
-	if len(items.Items) > 0 {
-		return &items.Items
-	} else {
-		panic("index out of range")
+		var toReturn *[]T
+		items.err = append(items.err, errors.New("No Items Found"))
+		return toReturn, items.err
 	}
 }
 
-func First[T any](items *Queryable[T]) *T {
+func AllOrDefault[T any](items *Queryable[T]) (*[]T, error) {
 	if len(items.Items) > 0 {
-		return &items.Items[0]
+		return &items.Items, nil
 	} else {
-		panic("index out of range")
+		var toReturn *[]T
+		return toReturn, errors.New("index out of range")
+	}
+}
+
+func First[T any](items *Queryable[T]) (*T, []error) {
+	if len(items.Items) > 0 {
+		return &items.Items[0], nil
+	} else {
+		var toReturn *T
+		items.err = append(items.err, errors.New("No Items Found"))
+		return toReturn, items.err
 	}
 }
 
