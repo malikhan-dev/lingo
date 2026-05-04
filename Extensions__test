@@ -160,10 +160,15 @@ func TestChainedSyntax(t *testing.T) {
 	result3 := AllOrDefault(From(items).Where("Flag", true))
 	result4 := FirstOrDefault(From(items).Where("Name", "John").Where("Flag", 2))
 
+	result5 := All(From(items).Filter(func(search ComplexObjectToSearch) bool {
+
+		return search.Name == "Jane" && search.Flag == true
+	}))
 	fmt.Println(*result)
 	fmt.Println(*result2)
 	fmt.Println(*result3)
 	fmt.Println(*result4)
+	fmt.Println(*result5)
 
 }
 func TestFilterByPredicate(t *testing.T) {
@@ -190,11 +195,11 @@ func TestFilterByPredicate(t *testing.T) {
 }
 
 func TestFilterFirstByPredicate(t *testing.T) {
-	item := FilterFirst(items, func(search ComplexObjectToSearch) bool {
+	/*item := FilterFirst(items, func(search ComplexObjectToSearch) bool {
 		return search.Flag == true
 	})
 
-	fmt.Println(item)
+	fmt.Println(item)*/
 }
 
 func TestCopyTo(t *testing.T) {
