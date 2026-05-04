@@ -155,51 +155,30 @@ func TestRemoveAllByPredicate(t *testing.T) {
 
 func TestChainedSyntax(t *testing.T) {
 
-	result := First(From(items).Where("Name", "John").Where("Flag", true))
-	result2 := All(From(items).Where("Name", "John").Where("Flag", true))
-	result3 := AllOrDefault(From(items).Where("Flag", true))
-	result4 := FirstOrDefault(From(items).Where("Name", "John").Where("Flag", 2))
+	result, err1 := First(From(items).Where("Name", "John").Where("Flag", true))
 
-	result5 := All(From(items).Filter(func(search ComplexObjectToSearch) bool {
+	result2, err2 := All(From(items).Where("Name", "John").Where("Flag", true))
+
+	result3, err3 := AllOrDefault(From(items).Where("Flag", true))
+
+	result4, err4 := FirstOrDefault(From(items).Where("Name", "John").Where("Flag", 2))
+
+	result5, err5 := All(From(items).Filter(func(search ComplexObjectToSearch) bool {
 
 		return search.Name == "Jane" && search.Flag == true
 	}))
+
 	fmt.Println(*result)
 	fmt.Println(*result2)
 	fmt.Println(*result3)
 	fmt.Println(*result4)
 	fmt.Println(*result5)
+	fmt.Println(err1)
+	fmt.Println(err2)
+	fmt.Println(err3)
+	fmt.Println(err4)
+	fmt.Println(err5)
 
-}
-func TestFilterByPredicate(t *testing.T) {
-
-	newItems := First(Where(items, func(search ComplexObjectToSearch) bool {
-		return search.Flag == true
-	}))
-
-	newItems2 := FirstOrDefault(Query(*WhereEx(items, "Name", "John"), "Flag", true))
-
-	newItems3 := FirstOrDefault(Query(*Query(*WhereEx(items, "Name", "John"), "Flag", false), "name", "jack"))
-
-	fmt.Println(*newItems)
-
-	fmt.Println(&newItems)
-
-	fmt.Println(*newItems2)
-
-	fmt.Println(&newItems2)
-
-	fmt.Println(*newItems3)
-
-	fmt.Println(&newItems3)
-}
-
-func TestFilterFirstByPredicate(t *testing.T) {
-	/*item := FilterFirst(items, func(search ComplexObjectToSearch) bool {
-		return search.Flag == true
-	})
-
-	fmt.Println(item)*/
 }
 
 func TestCopyTo(t *testing.T) {
@@ -280,19 +259,4 @@ func TestAny(t *testing.T) {
 		t.Error("Any Function Malfunction")
 	}
 
-}
-
-func TestPredicate(t *testing.T) {
-
-	result := WhereEx(items, "Name", "John")
-	result2 := WhereEx(items, "Flag", true)
-	result3 := WhereEx(items, "Flag", false)
-	/*	result4 := FirstOrDefault(Predicate(items, "Flag", "x"))
-		result5 := First(Predicate(items, "Flag", "x"))
-	*/
-	fmt.Println(result)
-	fmt.Println(result2)
-	fmt.Println(result3)
-	/*	fmt.Println(result4)
-		fmt.Println(result5)*/
 }
