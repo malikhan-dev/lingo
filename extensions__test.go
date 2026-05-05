@@ -333,3 +333,27 @@ func TestCollectRange(t *testing.T) {
 
 	fmt.Println(len(res))
 }
+
+func TestCollectRangeAndValidateData(t *testing.T) {
+
+	res, err := From(items).Filter(func(item ComplexObjectToSearch) bool {
+		return item.Id > 200000
+	}).AllOrDefault().CollectRange(200)
+
+	if err != nil {
+		t.Error(err)
+
+	}
+	if len(res) > 200 {
+		t.Error("Additional Data Fetched")
+	}
+
+	if res[0].Id != 200001 {
+		t.Error("Wrong Data Fetched")
+	}
+
+	if res[199].Id != 200200 {
+		t.Error("Wrong Data Fetched")
+	}
+
+}
