@@ -387,3 +387,104 @@ func TestIssueWithUnsignedTypes(t *testing.T) {
 
 }
 
+func TestNestedSearch(t *testing.T) {
+
+	type Address struct {
+		City string
+		Id   int
+		Flag bool
+	}
+	type Users struct {
+		Username string
+		Id       int32
+		Addr     []Address
+	}
+
+	var UserList []Users
+
+	UserList = append(UserList, Users{
+		Username: "jane",
+		Id:       1,
+		Addr: []Address{
+			{
+				City: "London",
+				Id:   1,
+				Flag: true,
+			},
+			{
+				City: "Paris",
+				Id:   2,
+				Flag: false,
+			},
+			{
+				City: "NYC",
+				Id:   3,
+				Flag: true,
+			},
+		},
+	})
+
+	UserList = append(UserList, Users{
+		Username: "marty",
+		Id:       1,
+		Addr: []Address{
+			{
+				City: "Los Angeles",
+				Id:   5,
+				Flag: true,
+			},
+			{
+				City: "Karaj",
+				Id:   7,
+				Flag: false,
+			},
+		},
+	})
+
+	res, err := From(UserList).Filter(func(user Users) bool {
+
+		data, err := From(user.Addr).Where("City", "Karaj").Collect()
+
+		if len(err) > 0 && err != nil {
+			return true
+		} else {
+			return len(data) > 0
+		}
+	}).AllOrDefault().Collect()
+
+	res2, err2 := From(UserList).Filter(func(user Users) bool {
+
+		return Any(user.Addr, func(address Address) bool {
+			return address.City == "Karaj"
+		})
+
+	}).AllOrDefault().Collect()
+
+	if err2 != nil {
+		t.Error(err2)
+	}
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(res2) == 0 {
+		t.Error("Data Fetch Failed")
+	}
+
+	if len(res) == 0 {
+		t.Error("Data Fetch Failed")
+	}
+
+	fmt.Println("================================")
+	fmt.Println(res)
+
+	fmt.Println(err)
+
+	fmt.Println("================================")
+
+	fmt.Println(res2)
+	fmt.Println(err2)
+
+	fmt.Println("================================")
+}
+
