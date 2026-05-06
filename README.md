@@ -43,3 +43,16 @@ The Benchmark Included In The Test File
 	}) {
 		b.Error("Wrong Data Fetched")
 	}
+
+
+
+
+
+
+---Introducing Collectors---
+   (V1.3.2) Or Higher (Breaking Change)
+
+After A Chained Operation Like Where(etc).AllOrDefault(), If We Want To Have The Result And Unwrap Queryable To A Tuple Of []T, and []err... We Use Collect And CollectRange functions. Its Important To Know That After Calling Collect The Result Is Not A Pointer Anymore. And Methods Like All And AllOrDefault Returns Queryable From Now On.
+
+
+
