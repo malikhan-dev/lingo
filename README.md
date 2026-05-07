@@ -42,8 +42,6 @@ As Of Now Lingo Is A Set Of Functions or Extensions That Can Help You Querying D
 	
  The Benchmark Included In The Test File
 
-<img width="1311" height="177" alt="Screenshot from 2026-05-07 15-57-29" src="https://github.com/user-attachments/assets/fd711d1c-9f5a-4ece-b14e-27ecea2e9fe3" />
 
-
-
+<img width="1178" height="308" alt="Lingo6" src="https://github.com/user-attachments/assets/f2c58a67-0f55-4a3f-a7be-1bccb7e1dd68" />
 
