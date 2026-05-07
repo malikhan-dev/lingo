@@ -19,20 +19,12 @@ As Of Now Lingo Is A Set Of Functions or Extensions That Can Help You Querying D
 
 ### Integrated Set Of Tools
 
-************************************************************************
+
+<img width="1287" height="465" alt="Screenshot from 2026-05-06 21-03-58" src="https://github.com/user-attachments/assets/6a681b6e-892e-4e72-9c67-eb7ee491dd53" />
+
 	
-	res2, err2 := From(UserList).Filter(func(user Users) bool {
 
-		return Any(user.Addr, func(address Address) bool {
-			return address.City == "Karaj"
-		})
-
-	}).AllOrDefault().Collect()
-	
-************************************************************************
-
-
-Our Benchmark Shows The Following Lines Of Code Took About 4.8 seconds To Run In A Slice Of 50,000,000 records. And The Data Validates. The Performance Looks Solid.
+Benchmarks Shows The Following Lines Of Code Took About 4.8 seconds To Run In A Slice Of 50,000,000 records. And The Data Validates. The Performance Looks Solid.
 	
 	Benchmark Pc Specs:
 	Laptop 
@@ -45,21 +37,8 @@ Our Benchmark Shows The Following Lines Of Code Took About 4.8 seconds To Run In
 	
 The Benchmark Included In The Test File
 
+<img width="1311" height="177" alt="Screenshot from 2026-05-07 15-57-29" src="https://github.com/user-attachments/assets/fd711d1c-9f5a-4ece-b14e-27ecea2e9fe3" />
 
-	res, err := From(items).Where("Flag", true).Filter(func(item ComplexObjectToSearch) bool {
-		return item.Id > 200000
-	}).AllOrDefault().Collect()
-
-	if err != nil {
-		b.Error(err)
-
-	}
-
-	if Any(*res, func(item ComplexObjectToSearch) bool {
-		return !item.Flag
-	}) {
-		b.Error("Wrong Data Fetched")
-	}
 
 
 
