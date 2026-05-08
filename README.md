@@ -153,8 +153,14 @@ you can use collectors to unwrap the `Queryable[T]` result into concrete values.
 
 After calling a collector, the result is no longer a pointer to `Queryable[T]`.
 
-<img width="705" height="38" alt="Screenshot from 2026-05-07 11-50-30" src="https://github.com/user-attachments/assets/bcb085a7-634d-43bd-8b78-41358fd37b6e" />
+```go
+	res, err := From(items).Where("Flag", true).Filter(func(item ComplexObjectToSearch) bool {
 
+		return item.Id > 200000
+
+	}).CollectRange(500)
+
+```
 ---
 
 ## Nested Search Example
