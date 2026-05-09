@@ -183,7 +183,7 @@ type CollectStream[T any] struct {
 	Value T
 	Err   OpError
 }
-* if Err.Code = 0 then there is no errors.
+* if Err.Code = 0 then there is no error.
 ```
 
 ## Nested Search Example
