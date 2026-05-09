@@ -12,6 +12,11 @@ type GroupedQueryable[K comparable, T any] struct {
 	Err   []OpError
 }
 
+type CollectStream[T any] struct {
+	Value T
+	Err   OpError
+}
+
 type OpError struct {
 	Code     int
 	Err      error
