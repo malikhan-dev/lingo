@@ -150,7 +150,7 @@ you can use collectors to unwrap the `Queryable[T]` result into concrete values.
 
 - `Collect()` returns the full result set and errors
 - `CollectRange(cnt)` returns a limited number of items based on the `cnt` argument, along with errors
--  `CollectChan(buffersize)` collect data and errors using go chan for your large data . available since version v1.4.0
+-  `PipeStream(buffersize) or CollectChan(buffersize)` collect data and errors using go chan for your large data . available since version v1.4.0
 
 ```go
 	res, err := From(items).Where("Flag", true).Filter(func(item ComplexObjectToSearch) bool {
@@ -164,13 +164,14 @@ you can use collectors to unwrap the `Queryable[T]` result into concrete values.
 
 ``` go
 
-for item := range From(items).Where("Flag", true).AllOrDefault().CollectChan(256) {
+for item := range From(items).Where("Flag", true).AllOrDefault().PipeStream(256) {
 
 		if item.Err.Code != 0 {
 			t.Error(item.Err)
 		}
 	}
 
+changed to PipeStream Since v1.4.1
 ```
 ---
 
