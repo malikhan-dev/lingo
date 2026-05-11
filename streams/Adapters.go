@@ -1,7 +1,7 @@
 package streams
 
 import (
-	lingo "lingo"
+	lingo "github.com/malikhan-dev/lingo"
 	"context"
 )
 
