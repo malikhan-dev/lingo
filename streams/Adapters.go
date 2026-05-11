@@ -1,7 +1,7 @@
 package streams
 
 import (
-	lingo "Lingo/src"
+	lingo "lingo"
 	"context"
 )
 
