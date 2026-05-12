@@ -344,9 +344,6 @@ ctx, cancel := context.WithCancel(context.Background())
 defer cancel()
 
 
-
-
-``` go
 	queryable := lingo.From(items)
 
 	mappedStream := streams.MapStream[ComplexObjectToSearch, SimplerType](ctx,
