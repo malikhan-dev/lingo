@@ -3,6 +3,8 @@
 **Expressive data querying for Go — stream your data efficiently with Lingo Stream Api — inspired by LINQ, designed for flexibility, and built with generics.**
 
 [![Starstruck](https://img.shields.io/badge/GitHub-Starstruck-yellow?style=for-the-badge&logo=github)](https://github.com/users/malikhan-dev/achievements/starstruck)
+![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=for-the-badge&logo=go)
+![License](https://img.shields.io/github/license/malikhan-dev/lingo?style=for-the-badge)
 
 
 This library was written and designed by Mohammadreza Malikhan. The source code is free to use with proper attribution. This project is licensed under the MIT License (see the LICENSE file for details).
