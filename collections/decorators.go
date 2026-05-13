@@ -2,7 +2,6 @@ package collections
 
 import (
 	"github.com/malikhan-dev/lingo/contracts"
-	"reflect"
 )
 
 func From[T any](items []T) *Queryable[T] {
