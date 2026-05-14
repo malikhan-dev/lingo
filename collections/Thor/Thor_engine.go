@@ -19,7 +19,7 @@ const (
 	GroupCollection = 5
 )
 
-func from[T any](items []T) *CollectionCompiledQueryable[T] {
+func From[T any](items []T) *CollectionCompiledQueryable[T] {
 
 	initiateOperator := make([]contracts.LingoOperator[T], 0)
 	initiateOperator = append(initiateOperator, contracts.LingoOperator[T]{
@@ -40,7 +40,7 @@ func from[T any](items []T) *CollectionCompiledQueryable[T] {
 		Queryable: queryData,
 	}
 }
-func (op *CollectionCompiledQueryable[T]) where(function func(T) bool) *CollectionCompiledQueryable[T] {
+func (op *CollectionCompiledQueryable[T]) Where(function func(T) bool) *CollectionCompiledQueryable[T] {
 
 	op.Queryable.Operators = append(op.Queryable.Operators, contracts.LingoOperator[T]{
 		OperatorType: WhereCollection,
@@ -52,7 +52,7 @@ func (op *CollectionCompiledQueryable[T]) where(function func(T) bool) *Collecti
 	return op
 }
 
-func (op *CollectionCompiledQueryable[T]) any(function func(T) bool) *AssertCompiledQueryable[T] {
+func (op *CollectionCompiledQueryable[T]) Any(function func(T) bool) *AssertCompiledQueryable[T] {
 
 	op.Queryable.Operators = append(op.Queryable.Operators, contracts.LingoOperator[T]{
 		OperatorType: AnyCollection,
