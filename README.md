@@ -66,6 +66,7 @@ go mod tidy
 
 ## Introducing The Thor Engine (v1.5.8)
 Impressive Performance of the engine has proven by our tests and benchmarks. it can Query And Validated a slice of 50 million records in 2 seconds with a fluent and rich syntax.
+Thor engine is an advanced alternative to default collections api with a huge performance improvement.
 
 ## Introducing lingo stream api's (v1.4.3)
 
