@@ -48,7 +48,7 @@ go mod tidy
   Write data operations in a clean, readable flow
   
 - **Impressive Performance of Thor engine**
-  the newly introduced thor query engine proves to be truly efficient. 
+  the newly introduced thor query engine proves to be truly efficient. almost 4x faster than the default collections api. 
   
 - **Two query styles**  
   Use dynamic field-based queries when flexibility matters, or type-safe predicates when you want stronger compile-time guarantees
@@ -65,7 +65,7 @@ go mod tidy
 ---
 
 ## Introducing The Thor Engine (v1.5.8)
-Impressive Performance of the engine has proven by our tests and benchmarks. Query And Validated a slice of 50 million records in 2 seconds.
+Impressive Performance of the engine has proven by our tests and benchmarks. it can Query And Validated a slice of 50 million records in 2 seconds with a fluent and rich syntax.
 
 ## Introducing lingo stream api's (v1.4.3)
 
@@ -95,7 +95,7 @@ Lingo can query and validate large datasets efficiently.
 
 <img width="1287" height="465" alt="Screenshot from 2026-05-06 21-03-58" src="https://github.com/user-attachments/assets/d6ebf9cb-6a20-4a91-bb2d-aa6e9f019e47" />
 
-**Focus on the problem you want to solve.**
+
 
 ---
 
@@ -185,7 +185,7 @@ you can use collectors to unwrap the `Queryable[T]` result into concrete values.
 
 - `Collect()` returns the full result set and errors
 - `CollectRange(cnt)` returns a limited number of items based on the `cnt` argument, along with errors
--  `PipeStream(buffersize) formerly( CollectChan(buffersize) )` collect data and errors using go chan for your large data . available since version v1.4.0
+-  `Pipe(buffersize) formerly( CollectChan(buffersize) )` collect data and errors using go chan for your large data . available since version v1.4.0
 
 ```go
 	res, err := From(items).Where("Flag", true).Filter(func(item ComplexObjectToSearch) bool {
@@ -211,18 +211,18 @@ for item := range From(items).Where("Flag", true).AllOrDefault().PipeStream(256)
 
 	groupable := lingo.GroupBy[bool, student](lingo.From(students).AllOrDefault(), "Present")
 
-	for item := range groupable.PipeStream(0) {
+	for item := range groupable.Pipe(0) {
 
 		for k, v := range item.Value {
 
         }
     }
 
-changed to PipeStream Since v1.4.1
+changed to Pipe() Since v1.4.1
 ```
 ---
 
-PipeStream(size) returns a new type named CollectStream.
+Pipe(size) returns a new type named CollectStream.
 
 ``` go
 
