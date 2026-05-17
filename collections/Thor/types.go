@@ -1,6 +1,6 @@
 package Thor
 
-import "github.com/malikhan-dev/lingo/contracts"
+import "github.com/malikhan-dev/zenq/contracts"
 
 type CollectionCompiledQueryable[T any] struct {
 	Queryable contracts.CompiledQueryable[T]
