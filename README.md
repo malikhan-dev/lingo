@@ -1,6 +1,6 @@
 # Lingo
 
-**Expressive data querying for Go — stream your data efficiently with Lingo Stream Api — Unleash The Power Of Thor Engine (v1.5.8), designed for flexibility, and built with generics.**
+**Expressive data querying for Go — Streaming Capabilities — Fast Collection Processing , Felxible Design.**
 ### GitHub Achievements
 
 [![Starstruck](https://img.shields.io/badge/GitHub-Starstruck-yellow?style=for-the-badge&logo=github)](https://github.com/users/malikhan-dev/achievements/starstruck)
@@ -20,7 +20,71 @@ This library was written and designed by Mohammadreza Malikhan. The source code 
 
 # Intro
 
-Lingo is a DSL (Domain Specific Language) for Go that helps you filter, search, validate, process and lately stream your data in a fluent and readable way. It is inspired by LINQ in C# and Streams in Java, while staying practical for Go developers. At its core, lingo is a modular library, currently it has 2 modules, Collections And Streams.
+Lingo is a DSL (Domain Specific Language) for Go that helps you filter, search, validate, process and lately stream your data in a fluent and readable way. It is inspired by LINQ in C# and Streams in Java, while staying practical for Go developers. At its core, lingo is a modular library, currently it has 2 modules, Collections And Streams. There Are 2 ways of processing collections, first is using default apis and second using the advance collection query engine known as thor. thor designed and architected in a way to provide maximum performance possible. it uses the operation fusion pattern to provide maximum speed and run the entire query chain in a single execution unit. streams on the other hand uses golang famous concepts such as channels to allow the user to stream the data with respect to cancelation concepts of golang. here is some examples...
+
+
+
+``` go
+a srreaming example
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	defer cancel()
+
+	count := 0
+
+	var buffer_size int
+
+	buffer_size = 10
+
+	for v := range streams.Throttle(ctx, streams.FilterStream(ctx, buffer_size, streams.FromData(ctx, buffer_size, items), func(item ComplexObjectToSearch) bool {
+		return item.Id > 2
+	}), 0) {
+
+		fmt.Println(v)
+
+		count++
+
+		if count == 100000 {
+			cancel()
+			break
+		}
+	}
+
+```
+
+
+``` go
+
+Grouping Collections using Thor engine
+
+
+
+collections.Collect(
+			collections.Group[bool, ComplexObjectToSearch](
+
+				collections.From(items).Where(func(search ComplexObjectToSearch) bool {
+
+					return search.Age > 20
+
+				}),
+				func(item ComplexObjectToSearch) bool {
+					return item.Flag
+				}))
+
+took around 3.8 seconds to filter and group a slice of 50,000,000 items
+
+```
+
+
+``` go
+the default api's for collections
+
+	collections.From(items).Where("Name", "John").Where("Flag", true).First().Collect()
+
+
+```
+
 
 Lingo supports two querying styles:
 
@@ -40,65 +104,6 @@ go mod tidy
 
 ---
 
-## Why Lingo?
-
-
-
-- **Fluent query chaining**  
-  Write data operations in a clean, readable flow
-  
-- **Impressive Performance of Thor engine**
-  the newly introduced thor query engine proves to be truly efficient. almost 4x faster than the default collections api. 
-  
-- **Two query styles**  
-  Use dynamic field-based queries when flexibility matters, or type-safe predicates when you want stronger compile-time guarantees
-
-- **Works with nested data**  
-  Useful for searching inside slices of structs and nested collections
-
-- **Generic core type**  
-  Built around `Queryable[T]` using modern Go generics
-
-- **Stream Or Collect The result**  
-  Keep chaining while querying, then explicitly unwrap results when needed or stream them.
-
----
-
-## Introducing The Thor Engine (v1.5.8)
-Impressive Performance of the engine has proven by our tests and benchmarks. it can Query And Validated a slice of 50 million records in 2 seconds with a fluent and rich syntax.
-Thor engine is an advanced alternative to default collections api with a huge performance improvement.
-
-## Introducing lingo stream api's (v1.4.3)
-
-Useful pipelines available for your needs to stream your data.
-
-<img width="721" height="676" alt="Screenshot from 2026-05-11 21-08-37" src="https://github.com/user-attachments/assets/ecc015ab-f905-4891-839f-bededf93c5e5" />
-
-
-
-
-## Quick Tour
-
-### Simple API
-
-<img width="1273" height="359" alt="Lingo5" src="https://github.com/user-attachments/assets/6b230dc5-01f7-47ad-b358-a1949f75c6b3" />
-
-### Fast on large datasets
-
-Lingo can query and validate large datasets efficiently.
-
-**50,000,000 records queried and validated in under 1.8 seconds using the Thor Engine and 5 seconds using default Apis**  
-
-
-(visit the test files and prepare your own tests.)
-
-### Expressive syntax
-
-<img width="1287" height="465" alt="Screenshot from 2026-05-06 21-03-58" src="https://github.com/user-attachments/assets/d6ebf9cb-6a20-4a91-bb2d-aa6e9f019e47" />
-
-
-
----
 
 ## Core Concepts (default collections api)
 
@@ -555,6 +560,91 @@ defer cancel()
     }
 
 
+```
+
+
+# Thor Engine Apis For Collection Processing
+
+a faster, more go style alternative of default collections api is to use the thor engine to query your data. the thor engine uses the operator fusion patterns to ensure maximum speed and single execution unit.
+
+Core Concept:
+1 - CollectionCompiledQueryable[T[
+After each chain of operation, we use this type as a contract. much like queryable in default collections api.
+
+2 - AssertCompiledQueryable[T]
+In our query chains, if we want to assert the result like Any() operator this is the output
+
+3- GroupCompiledQueryable
+after grouping operation the returning type is GroupCompiledQueryable[K, T]
+
+
+both three type CompiledQueryable[T] nested inside them. CompiledQueryable represents the result of operation in the Items property and the list of operators.
+
+``` go
+type CompiledQueryable[T any] struct {
+	Operators []LingoOperator[T]
+	Items     *[]T
+}
+```
+Thor Engine Apis are as follow...
+
+
+* From[T any]
+
+accepts an slice of []T and returns a *CollectionCompiledQueryable[T] To initiate a query chain.
+
+
+Where[T any]
+
+accepts a function func(T) bool as argument and filters the collection then returns *CollectionCompiledQueryable[T]
+
+
+Collect
+
+Collects the result and returns The CollectionCompiledQueryable[T] which has the data in it.
+
+Example
+
+``` go
+
+result := collections.From(items).Where(func(search ComplexObjectToSearch) bool {
+		return search.Name == "Jane" && search.Flag == false
+	}).Collect()
+
+	result2 := collections.From(result).Any(func(search ComplexObjectToSearch) bool {
+		return (search.Name != "Jane") || (search.Flag != false)
+	}).Assert()
+
+	if result2 {
+		t.Error("result should be false")
+	}
+
+```
+
+
+Group And Collect
+
+The group function expects a CompiledQueryable[T] as an argument and a Key Selector function. For Collecting the result of a group we can use collections.Collect() function.
+
+a grouping example. filter the users whose age are bigger than 20 and group them by their pressence
+
+
+``` go
+res :=
+		collections.Collect(
+			collections.Group[bool, ComplexObjectToSearch](
+
+				collections.From(items).Where(func(search ComplexObjectToSearch) bool {
+
+					return search.Age > 20
+
+				}),
+				func(item ComplexObjectToSearch) bool {
+					return item.Flag
+				}))
+
+	fmt.Println(res.Items[false][1])
+	fmt.Println(res.Items[true][1])
 ```
 
 
