@@ -589,17 +589,17 @@ type CompiledQueryable[T any] struct {
 Thor Engine Apis are as follow...
 
 
-* From[T any]
+** From[T any]
 
 accepts an slice of []T and returns a *CollectionCompiledQueryable[T] To initiate a query chain.
 
 
-Where[T any]
+** Where[T any]
 
 accepts a function func(T) bool as argument and filters the collection then returns *CollectionCompiledQueryable[T]
 
 
-Collect
+** Collect
 
 Collects the result and returns The CollectionCompiledQueryable[T] which has the data in it.
 
@@ -622,7 +622,7 @@ result := collections.From(items).Where(func(search ComplexObjectToSearch) bool 
 ```
 
 
-Group And Collect
+** Group And Collect
 
 The group function expects a CompiledQueryable[T] as an argument and a Key Selector function. For Collecting the result of a group we can use collections.Collect() function.
 
@@ -647,6 +647,18 @@ res :=
 	fmt.Println(res.Items[true][1])
 ```
 
+
+** Assert()
+
+Asserts The Collection on a given criteria. returns
+
+``` go
+
+	result2 := collections.From(result).Any(func(search ComplexObjectToSearch) bool {
+		return (search.Name != "Jane") || (search.Flag != false)
+	}).Assert()
+
+```
 
 
 ## Project Status
