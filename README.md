@@ -79,11 +79,11 @@ Whether you want convenience, readability, or performance, Lingo gives you a cle
 
 ## Installation
 
-bash
+``` bash
 go get github.com/malikhan-dev/lingo@latest
-go mod tidy
 
----
+go mod tidy
+```
 
 ## Core Concepts (Default Collections API)
 
