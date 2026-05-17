@@ -1,0 +1,23 @@
+package Thor
+
+import "context"
+
+func FromQueryable[T any](ctx context.Context, BufferSize int, items CollectionCompiledQueryable[T]) <-chan T {
+	out := make(chan T, BufferSize)
+
+	go func() {
+		defer close(out)
+
+		for _, v := range *items.Queryable.Items {
+
+			select {
+			case <-ctx.Done():
+				return
+			case out <- v:
+			}
+
+		}
+
+	}()
+	return out
+}
