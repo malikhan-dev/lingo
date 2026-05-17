@@ -1,7 +1,7 @@
 package collections
 
 import (
-	"github.com/malikhan-dev/lingo/contracts"
+	"github.com/malikhan-dev/zenq/contracts"
 )
 
 func From[T any](items []T) *Queryable[T] {
