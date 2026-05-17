@@ -85,7 +85,17 @@ go get github.com/malikhan-dev/lingo@latest
 go mod tidy
 ```
 
-## Core Concepts (Default Collections API)
+## Default Collections API
+
+
+
+
+import path
+
+``` go
+collections  "github.com/malikhan-dev/lingo/collections"
+```
+
 
 ### `Queryable[T]`
 
@@ -266,6 +276,16 @@ Lingo provides a Stream API that allows data to be processed incrementally as it
 
 There are 3 adapters available to initiate a stream:
 
+
+
+import path
+``` go
+
+streams  "github.com/malikhan-dev/lingo/streams"
+
+```
+
+
 ## FromQueryable
 
 Creates a stream from a `Queryable`.
@@ -436,6 +456,12 @@ for v := range mappedStream {
 # Thor Engine APIs For Collection Processing
 
 A faster, more Go-idiomatic alternative to the default collections API is to use the **Thor** engine to query your data. The Thor engine uses the operator fusion pattern to ensure maximum speed and a single execution unit.
+
+
+import path
+``` go
+collections "github.com/malikhan-dev/lingo/collections/Thor"
+```
 
 ### Core Concepts:
 1. **`CollectionCompiledQueryable[T]`**: After each chain of operation, we use this type as a contract (much like `Queryable` in the default collections API).
