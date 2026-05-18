@@ -344,6 +344,29 @@ result2 := collections.From(result).Any(func(search ComplexObjectToSearch) bool 
 ```
 
 
+
+## Nested Search Example (Thor Api)
+
+Imagine you have a slice of users, and each user has multiple addresses.
+Now suppose you want to find all users where a specific city exists in their addresses. how can we make such query using Thor API?
+
+``` go
+
+	res :=
+		collections.From(UserList).Where(func(user Users) bool {
+
+			return collections.From(user.Addr).Any(func(address Address) bool {
+				return address.City == "Karaj"
+			}).Assert()
+
+		}).Collect()
+
+	fmt.Println(res)
+
+```
+---
+
+
 # zenq Stream API
 
 When dealing with large datasets, it is not always recommended to collect everything into memory using the traditional `Queryable` execution model.
