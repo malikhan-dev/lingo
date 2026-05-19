@@ -1,10 +1,13 @@
 package streams
 
 import (
-	"github.com/malikhan-dev/zenq/collections"
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
+	"time"
+
+	"github.com/malikhan-dev/zenq/collections"
 )
 
 type ComplexObjectToSearch struct {
@@ -12,6 +15,21 @@ type ComplexObjectToSearch struct {
 	Age  int
 	Id   int
 	Flag bool
+}
+
+type customer struct {
+	Index            int
+	CustomerId       string
+	FirstName        string
+	LastName         string
+	Company          string
+	City             string
+	Country          string
+	Phone1           string
+	Phone2           string
+	Email            string
+	SubscriptionDate string
+	Website          string
 }
 
 var items []ComplexObjectToSearch
@@ -55,7 +73,7 @@ func init() {
 
 func LoadLargeData() {
 	randFlag := false
-	for i := 0; i < 200; i++ {
+	for i := 0; i < 50; i++ {
 
 		items = append(items, ComplexObjectToSearch{
 			Name: "Jane",
@@ -165,12 +183,12 @@ func TestStreamsFromThorQueryable(t *testing.T) {
 
 	buffer_size = 10
 
-	queryable := TCollection.From(items)
+	queryable := collections.From(items)
 
 	mappedStream := MapStream[ComplexObjectToSearch, SimplerType](ctx,
 		Throttle(ctx,
 			FilterStream(ctx, buffer_size,
-				TCollection.FromQueryable(ctx, buffer_size, *queryable),
+				collections.FromQueryable(ctx, buffer_size, *queryable),
 				func(item ComplexObjectToSearch) bool {
 
 					return item.Id > 0
@@ -234,6 +252,101 @@ func TestStreamsFromChannel(t *testing.T) {
 			cancel()
 			break
 		}
+	}
+
+}
+
+func TestStreamFromCsv(t *testing.T) {
+
+	type customer struct {
+		Index            int
+		CustomerId       string
+		FirstName        string
+		LastName         string
+		Company          string
+		City             string
+		Country          string
+		Phone1           string
+		Phone2           string
+		Email            string
+		SubscriptionDate string
+		Website          string
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+
+	defer cancel()
+
+	for i := range Throttle(ctx,
+		FilterStream(ctx, 5,
+			FromCsv(ctx, 256, "../customers-100.csv", func(row []string) (customer, error) {
+
+				//this is mapping function
+
+				index, err := strconv.Atoi(row[0])
+				if err != nil {
+					index = 0
+				}
+				return customer{
+					CustomerId:       row[1],
+					Index:            index,
+					FirstName:        row[2],
+					LastName:         row[3],
+					Company:          row[4],
+					City:             row[5],
+					Country:          row[6],
+					Phone1:           row[7],
+					Phone2:           row[8],
+					Email:            row[9],
+					SubscriptionDate: row[10],
+					Website:          row[11],
+				}, err
+			}), func(customer customer) bool {
+				//this is filter on data
+				return customer.Index > 40
+			}), 250*time.Millisecond) {
+
+		//here you can do the bussiness
+		fmt.Println(i)
+	}
+
+}
+
+func TestStreamFromCsv2(t *testing.T) {
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	defer cancel()
+
+	result2 :=
+		TakeAll[customer](ctx,
+			FilterStream(ctx, 5,
+				FromCsv(ctx, 256, "../customers-100.csv", func(row []string) (customer, error) {
+					index, err := strconv.Atoi(row[0])
+					if err != nil {
+						index = 0
+					}
+					return customer{
+						CustomerId:       row[1],
+						Index:            index,
+						FirstName:        row[2],
+						LastName:         row[3],
+						Company:          row[4],
+						City:             row[5],
+						Country:          row[6],
+						Phone1:           row[7],
+						Phone2:           row[8],
+						Email:            row[9],
+						SubscriptionDate: row[10],
+						Website:          row[11],
+					}, err
+				}), func(customer customer) bool {
+					//this is filter on data
+					return customer.Index > 64
+				}))
+
+	for _, v := range result2 {
+		fmt.Println(v.Index)
+		fmt.Println(v.FirstName)
 	}
 
 }
