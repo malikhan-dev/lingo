@@ -658,7 +658,7 @@ then its time to design our pipelines. we plugin the csv adapter (FromCsv) then 
 ```
 
 data := FromCsv(ctx, CsvStreamConfig).FilterStream(func(c customer) bool {
-		return c.Index > 0
+		return c.Index > 60
 	}).TakeAll()
 
 
