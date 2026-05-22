@@ -529,7 +529,7 @@ defer cancel()
 
 for v := range FromData[ComplexObjectToSearch](ctx, items).FilterStream(func(search ComplexObjectToSearch) bool {
 	return search.Id > 2
-}).Throttle(0).Channel {
+}).Throttle(0).TakeAll() {
 
 }
 
@@ -557,7 +557,7 @@ process stream from a channel
 
 	for v := range FromChannel[ComplexObjectToSearch](ctx, channel).FilterStream(func(complex ComplexObjectToSearch) bool {
 		return complex.Id > 2
-	}).Throttle(time.Millisecond * 500).Channel {
+	}).Throttle(time.Millisecond * 500).TakeAll() {
 
 
 ```
