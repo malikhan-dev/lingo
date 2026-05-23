@@ -783,11 +783,9 @@ the main difference between streams and compiled streams is that the compiled st
 
 ## benchmark
 
-in a slice of 50,000,000 users it took less than 2 seconds just to filter them and around 4 seconds to filter then group the items.
+in a slice of 50,000,000 users it took less than 2 seconds just to filter them and around 4 seconds to filter then group the items. to achieve this result we used thor collections api, not the default api collections.
 
 
-<img width="1138" height="893" alt="bench2" src="https://github.com/user-attachments/assets/644db764-425e-4a70-97b3-1b649ca9864f" />
-<img width="1133" height="772" alt="bench1" src="https://github.com/user-attachments/assets/6dca9160-e0ed-4c04-bcb2-8ea519a7f27d" />
 
 
 
