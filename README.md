@@ -1,3 +1,13 @@
+[![Starstruck](https://img.shields.io/badge/GitHub-Starstruck-yellow?style=for-the-badge&logo=github)](https://github.com/users/malikhan-dev/achievements/starstruck)
+![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=for-the-badge&logo=go)
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen?style=for-the-badge&logo=go)
+![Maintained](https://img.shields.io/badge/maintained-yes-brightgreen?style=for-the-badge)
+![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.6.6.1-blue?style=for-the-badge)
+
+
+
+
 # Zen-Q (zenq)
 
 **Expressive data querying for Go — Streaming Capabilities — Fast Collection Processing, Flexible Design.**
@@ -17,13 +27,6 @@
 ‌
 ```
 
-
-[![Starstruck](https://img.shields.io/badge/GitHub-Starstruck-yellow?style=for-the-badge&logo=github)](https://github.com/users/malikhan-dev/achievements/starstruck)
-![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=for-the-badge&logo=go)
-![Tests](https://img.shields.io/badge/tests-passing-brightgreen?style=for-the-badge&logo=go)
-![Maintained](https://img.shields.io/badge/maintained-yes-brightgreen?style=for-the-badge)
-![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-1.6.6.1-blue?style=for-the-badge)
 
 
 
