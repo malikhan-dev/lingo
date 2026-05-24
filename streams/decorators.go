@@ -11,8 +11,9 @@ const buffer_size = 256
 
 func FromCsv[T any](ctx context.Context, Conf contracts.CsvStreamConf[T]) Streamable[T] {
 	return Streamable[T]{
-		Context: ctx,
-		Channel: fromCsv[T](ctx, Conf),
+		Context:    ctx,
+		Channel:    fromCsv[T](ctx, Conf),
+		BufferSize: Conf.BufferSize,
 	}
 }
 
@@ -34,8 +35,9 @@ func FromChannel[T any](ctx context.Context, items <-chan T) Streamable[T] {
 
 func (currStr Streamable[T]) FilterStream(Filter func(T) bool) Streamable[T] {
 	return Streamable[T]{
-		Context: currStr.Context,
-		Channel: filterStream[T](currStr.Context, buffer_size, currStr.Channel, Filter),
+		Context:    currStr.Context,
+		Channel:    filterStream[T](currStr.Context, currStr.BufferSize, currStr.Channel, Filter),
+		BufferSize: currStr.BufferSize,
 	}
 }
 
@@ -45,7 +47,8 @@ func (currStr Streamable[T]) TakeAll() []T {
 
 func (currStr Streamable[T]) Throttle(duration time.Duration) Streamable[T] {
 	return Streamable[T]{
-		Context: currStr.Context,
-		Channel: throttle[T](currStr.Context, currStr.Channel, duration),
+		Context:    currStr.Context,
+		Channel:    throttle[T](currStr.Context, currStr.Channel, duration),
+		BufferSize: currStr.BufferSize,
 	}
 }
