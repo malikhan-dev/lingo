@@ -8,7 +8,7 @@ func FromQueryable[T any](ctx context.Context, BufferSize int, items CollectionC
 	go func() {
 		defer close(out)
 
-		for _, v := range *items.Queryable.Items {
+		for _, v := range *items.Items {
 
 			select {
 			case <-ctx.Done():
