@@ -279,7 +279,7 @@ result, err2 := GroupBy[uint32, SysUser](From(users).Filter(func(user SysUser) b
 
 
 
-# Thor Engine APIs For Collection Processing
+# Thor Collection Api
 
 A faster, more Go-idiomatic alternative to the default collections API is to use the **Thor** engine to query your data. The Thor engine uses the operator fusion pattern to ensure maximum speed and a single execution unit.
 
