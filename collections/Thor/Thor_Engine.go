@@ -36,12 +36,12 @@ func From[T any](items []T) *CollectionCompiledQueryable[T] {
 	}
 
 	return &CollectionCompiledQueryable[T]{
-		Queryable: queryData,
+		queryData,
 	}
 }
 func (op *CollectionCompiledQueryable[T]) Where(function func(T) bool) *CollectionCompiledQueryable[T] {
 
-	op.Queryable.Operators = append(op.Queryable.Operators, contracts.LingoOperator[T]{
+	op.Operators = append(op.Operators, contracts.LingoOperator[T]{
 		OperatorType: WhereCollection,
 		MetaData: contracts.OpData[T]{
 			MetaData: "where",
@@ -53,7 +53,7 @@ func (op *CollectionCompiledQueryable[T]) Where(function func(T) bool) *Collecti
 
 func (op *CollectionCompiledQueryable[T]) Any(function func(T) bool) *AssertCompiledQueryable[T] {
 
-	op.Queryable.Operators = append(op.Queryable.Operators, contracts.LingoOperator[T]{
+	op.Operators = append(op.Operators, contracts.LingoOperator[T]{
 		OperatorType: AnyCollection,
 		MetaData: contracts.OpData[T]{
 			MetaData: "any",
@@ -61,13 +61,13 @@ func (op *CollectionCompiledQueryable[T]) Any(function func(T) bool) *AssertComp
 		},
 	})
 	return &AssertCompiledQueryable[T]{
-		Queryable: op.Queryable,
+		op.CompiledQueryable,
 	}
 }
 
 func Group[K comparable, T any](op *CollectionCompiledQueryable[T], locator func(T) K) *GroupCompiledQueryable[K, T] {
 
-	op.Queryable.Operators = append(op.Queryable.Operators, contracts.LingoOperator[T]{
+	op.Operators = append(op.Operators, contracts.LingoOperator[T]{
 		OperatorType: GroupCollection,
 		MetaData: contracts.OpData[T]{
 			MetaData: "group",
@@ -77,8 +77,8 @@ func Group[K comparable, T any](op *CollectionCompiledQueryable[T], locator func
 		},
 	})
 	return &GroupCompiledQueryable[K, T]{
-		Queryable:   op.Queryable,
-		PropLocator: locator,
+		CompiledQueryable: op.CompiledQueryable,
+		PropLocator:       locator,
 	}
 }
 
@@ -86,9 +86,9 @@ func (op *AssertCompiledQueryable[T]) Assert() bool {
 
 	Any := false
 
-	for _, item := range *op.Queryable.Items {
+	for _, item := range *op.Items {
 
-		for _, op := range op.Queryable.Operators {
+		for _, op := range op.Operators {
 
 			switch op.OperatorType {
 
@@ -133,11 +133,11 @@ func (op *CollectionCompiledQueryable[T]) Collect() []T {
 
 	result = make([]T, 0)
 
-	for _, item := range *op.Queryable.Items {
+	for _, item := range *op.Items {
 
 		keep := true
 
-		for _, op := range op.Queryable.Operators {
+		for _, op := range op.Operators {
 
 			keep = CoreFilter(op, item)
 
@@ -162,13 +162,13 @@ func (op *GroupCompiledQueryable[K, T]) Collect() *collections.GroupedQueryable[
 
 	var LocatedKey K
 
-	for _, item := range *op.Queryable.Items {
+	for _, item := range *op.Items {
 
 		LocatedKey = op.PropLocator(item)
 
 		keep := true
 
-		for _, operator := range op.Queryable.Operators {
+		for _, operator := range op.Operators {
 
 			keep = CoreFilter(operator, item)
 
