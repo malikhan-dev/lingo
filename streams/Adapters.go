@@ -100,7 +100,7 @@ func fromCsv[T any](ctx context.Context, conf contracts.CsvStreamConf[T]) <-chan
 				break
 			}
 			if err != nil {
-				// read error, not parse error
+				
 				break
 			}
 
@@ -113,14 +113,11 @@ func fromCsv[T any](ctx context.Context, conf contracts.CsvStreamConf[T]) <-chan
 				}
 				continue
 			}
-
-			// ✅ اینجا اگه channel پر باشه، صبر میکنه
-			// و اگه ctx cancel بشه، خارج میشه
 			select {
 			case <-ctx.Done():
-				return // ← return نه break، از goroutine کامل خارج میشه
+				return 
 			case out <- v:
-				// sent successfully, or waited until space was available
+				
 			}
 		}
 	}()
