@@ -3,7 +3,7 @@
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen?style=for-the-badge&logo=go)
 ![Maintained](https://img.shields.io/badge/maintained-yes-brightgreen?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-1.6.6.1-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.7.0-blue?style=for-the-badge)
 
 
 
@@ -60,13 +60,13 @@ This library was written and designed by Mohammadreza Malikhan. The source code 
 
 zenq is a DSL (Domain Specific Language) for Go that helps you filter, search, validate, process, and stream your data in a fluent and readable way. It is inspired by LINQ in C# and Streams in Java, while staying practical for Go developers. make sure you review the benchmarks section at the end of this document. 
 
-At its core, zenq is a modular library. Currently, it has two modules: **Collections** and **Streams**. 
+At its core, zenq is a modular library. Currently, it has two modules: **Collections** and **Streams**. streams used to initiate communications with async data-sources, such as a csv file. 
 
 There are two ways of processing collections:
 1. Using default APIs.
 2. Using the advanced collection query engine known as **Thor**. 
 
-Thor is designed and architected to provide the maximum performance possible. It uses the operation fusion pattern to provide maximum speed and run the entire query chain in a single execution unit. Streams, on the other hand, use famous Golang concepts such as channels and goroutines to allow the user to stream data while respecting the cancellation concepts of Go. at the moment zenq operations allowed on multiple data sources, in-memory slices, channels, csv files and json files. more and more data-sources will be supported soon.
+Thor is designed and architected to provide the maximum performance possible. It uses the operation fusion pattern to provide maximum speed and run the entire query chain in a single execution unit. Streams, on the other hand, use famous Golang concepts such as channels and goroutines to allow the user to stream data while respecting the cancellation concepts of Go. at the moment zenq operations allowed on various data sources, in-memory slices, channels, csv files and json files. more and more data-sources will be supported soon.
 
 Here are some examples:
 
@@ -421,7 +421,7 @@ When dealing with large datasets, it is not always recommended to collect everyt
 
 zenq provides a Stream API that allows data to be processed incrementally as it flows through a pipeline. Also, streams can be executed with a compiled mode mechanism which is 35% faster than regular streams.
 
-There are 3 adapters available to initiate a stream:
+Currently there are 4 adapters available to initiate a stream:
 
 
 
@@ -463,19 +463,16 @@ Creates a stream from a specific csv file. can perform filters on the stream of 
 - contracts.CsvStreamConf[T] contains following properties:
 
 ``` go
-		type CsvStreamConf[T any] struct {
-
-			Parser func(row []string) (T, error)
-		
-			StreamHeaders bool
-		
+		type StreamConf struct {
 			FilePath string
-		
 			BufferSize int
-		
-			ParseErrorCallback func(error, int)
-		
+			ParseErrorCallback func([]error, int)
 			ItemCount int
+		}
+		type CsvStreamConf[T any] struct {
+			Parser        func(row []string) (T, []error)
+			StreamHeaders bool
+			StreamConf
 		}
 
 ```
@@ -487,12 +484,39 @@ Creates a stream from a specific csv file. can perform filters on the stream of 
   
   4 - A BufferSize. atleast 128 recommended.
   
-  5 - A callback for when the parser cant parse the row and an error occures, other rows will be streamed though.
+  5 - A callback for when the parser cant parse the row and an error occures, other rows will be streamed though, unless user signals the cancelation through the 'context'.
   
   6 - An ItemCount for when we want to fetch a limited number of csv rows. use 0 to fetch them all.
 
-  * warning: ItemCount should not be bigger than buffer size. its recommended to provide sufficient amount of buffer size to prevent instability issues.
 
+
+## FromJsonArr
+
+Creates a stream from a specific json file. can perform filters on the stream of data.
+
+**Args:**
+
+1. A context to manage cancellation
+2. A contracts.StreamConf type that configures how the stream will initiate.
+
+ ``` go
+		type StreamConf struct {
+			FilePath string		
+			BufferSize int
+			ParseErrorCallback func([]error, int)
+			ItemCount int **unsupported at the moment**
+		}
+ ```
+ 
+  1 - A FilePath of the csv file
+  
+  2 - A BufferSize. atleast 128 recommended.
+  
+  3 - A callback for when the parser cant parse the row and an error occures, other rows will be streamed though, unless user signals the cancelation through the 'context'.
+  
+  4 - To be supported on the next releases.
+
+  
 # Stream Pipelines
 
 Once a stream is created, it can be processed using different pipeline stages.
@@ -778,12 +802,83 @@ for k, v := range GroupCollection.Items {
 ```
 
 
+## A Real‑World Example of Querying JSON Files
+imagine we want to read a json file and stream its data in real-time. we dont want to wait for all the rows of our json array to be read. and its required that we skip any errors that might happens at the first row. 
 
 
+``` go
+[
+  {
+    "id": 1,
+    "username": "user_1",
+    "email": "user_1@example.com",
+    "is_active": true,
+    "created_at": "2026-05-23T13:15:06.534680"
+  },
+  {
+    "id": 2,
+    "username": "user_2",
+    "email": "user_2@example.com",
+    "is_active": false,
+    "created_at": "2026-05-22T13:15:06.534750"
+  },
+  {
+    "id": 3,
+    "username": "user_3",
+    "email": "user_3@example.com",
+    "is_active": true,
+    "created_at": "2026-05-21T13:15:06.534758"
+  },
+  {
+    "id": 4,
+    "username": "user_4",
+    "email": "user_4@example.com",
+    "is_active": true,
+    "created_at": "2026-05-20T13:15:06.534763"
+  }
+]
+```
 
 
+``` go
 
+type User struct {
+		ID        int    `json:"id"`
+		Username  string `json:"username"`
+		Email     string `json:"email"`
+		IsActive  bool   `json:"is_active"`
+		CreatedAt string `json:"created_at"`
+	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+
+	defer cancel()
+
+	var jsonStreamConfig contracts.JsonStreamConf
+
+	jsonStreamConfig.FilePath = "users_data.json"
+
+	jsonStreamConfig.BufferSize = 256
+
+	jsonStreamConfig.ParseErrorCallback = func(err []error, i int) {
+
+		fmt.Println(err, " at", i)
+
+		if i > 1 {
+			cancel()
+		}
+	}
+
+	data := FromJsonArr[User](ctx, jsonStreamConfig.StreamConf).FilterStream(func(c User) bool {
+		return c.ID > 0
+	})
+
+	for v := range data.Channel {
+		time.Sleep(time.Millisecond * 10)
+		fmt.Println(" value: ", v)
+	}
+
+```
 
 
 # Compiled Streams
