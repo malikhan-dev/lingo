@@ -15,7 +15,7 @@ func FromCsv[T any](ctx context.Context, Conf contracts.CsvStreamConf[T]) Stream
 		Context:    ctx,
 		Channel:    stream,
 		BufferSize: Conf.BufferSize,
-		err:        []error{err},
+		Err:        []error{err},
 		Initiated:  err == nil,
 	}
 }
@@ -26,7 +26,7 @@ func FromJsonArr[T any](ctx context.Context, Conf contracts.StreamConf) Streamab
 		Context:    ctx,
 		Channel:    stream,
 		BufferSize: Conf.BufferSize,
-		err:        []error{err},
+		Err:        []error{err},
 		Initiated:  err == nil,
 	}
 }
@@ -52,7 +52,7 @@ func (currStr Streamable[T]) FilterStream(Filter func(T) bool) Streamable[T] {
 		Context:    currStr.Context,
 		Channel:    filterStream[T](currStr.Context, currStr.BufferSize, currStr.Channel, Filter),
 		BufferSize: currStr.BufferSize,
-		err:        currStr.Err,
+		Err:        currStr.Err,
 	}
 }
 
