@@ -3,7 +3,7 @@
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen?style=for-the-badge&logo=go)
 ![Maintained](https://img.shields.io/badge/maintained-yes-brightgreen?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-1.7.0-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.7.2.1-blue?style=for-the-badge)
 
 
 
@@ -567,6 +567,27 @@ Streams respect `context.Context` cancellation to:
 - Support early termination.
 - Properly manage pipeline lifecycle.
 
+
+# Initiated Stream
+
+it is strongly recommended that when initiating a stream from an asynch source, check that the stream is actually possible. a go idiomatic stream initiation can be something like:
+
+``` go
+
+
+	if stream := FromJsonArr[User](ctx, jsonStreamConfig.StreamConf); stream.Initiated {
+
+		data := stream.FilterStream(func(c User) bool {
+			return c.ID > 0
+		})
+
+		for v := range data.Channel {
+			time.Sleep(time.Millisecond * 10)
+			fmt.Println(" value: ", v)
+		}
+	}
+
+```
 
 # Example Of Streams
 
