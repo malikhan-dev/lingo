@@ -17,6 +17,14 @@ type ComplexObjectToSearch struct {
 	Flag bool
 }
 
+type UserDTO struct {
+	ID       int    `json:"id" csv:"id"`
+	Name     string `json:"name" csv:"name"`
+	Age      int    `json:"age" csv:"age"`
+	Email    string `json:"email" csv:"email"`
+	IsActive bool   `json:"is_active" csv:"is_active"`
+}
+
 type User struct {
 	ID        int    `json:"id"`
 	Username  string `json:"username"`
@@ -162,14 +170,6 @@ func TestStreamsFromChannel(t *testing.T) {
 }
 
 func TestStreamFromCsv(t *testing.T) {
-
-	type UserDTO struct {
-		ID       int    `json:"id" csv:"id"`
-		Name     string `json:"name" csv:"name"`
-		Age      int    `json:"age" csv:"age"`
-		Email    string `json:"email" csv:"email"`
-		IsActive bool   `json:"is_active" csv:"is_active"`
-	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -333,3 +333,72 @@ func TestCsvInitiation(t *testing.T) {
 	}
 }
 
+func TestCsvReadHeaders(t *testing.T) {
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	defer cancel()
+
+	var CsvStreamConfig contracts.CsvStreamConf[UserDTO]
+
+	CsvStreamConfig.StreamHeaders = false
+
+	CsvStreamConfig.FilePath = "users_data3.csv"
+
+	CsvStreamConfig.BufferSize = 256
+
+	CsvStreamConfig.Parser = func(row []string) (UserDTO, []error) {
+
+		var errorList []error
+
+		index, err := strconv.Atoi(row[0])
+
+		if err != nil {
+			errorList = append(errorList, err)
+		}
+		age, err2 := strconv.Atoi(row[2])
+
+		if err2 != nil {
+			errorList = append(errorList, err2)
+		}
+
+		active, err3 := strconv.ParseBool(row[4])
+
+		if err3 != nil {
+			errorList = append(errorList, err3)
+		}
+		return UserDTO{
+			ID:       index,
+			Name:     row[1],
+			Age:      age,
+			Email:    row[3],
+			IsActive: active,
+		}, errorList
+	}
+
+	CsvStreamConfig.ParseErrorCallback = func(err []error, i int) {
+
+		fmt.Println(err, " at", i)
+
+		if i > 3 {
+
+			cancel()
+		}
+
+	}
+
+	if stream := FromCsv[UserDTO](ctx, CsvStreamConfig); stream.Initiated {
+
+		for v, i := range stream.TakeAll() {
+			fmt.Println(v)
+			fmt.Println(i)
+		}
+
+		for v := range stream.Throttle(time.Second * 1).Channel {
+			fmt.Println(v)
+		}
+
+	} else {
+		fmt.Println(stream.Err)
+	}
+}
