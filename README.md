@@ -40,31 +40,34 @@
 
 
 
-		stream :=
-			MySql.FromMySqlRows[UserModel](ctx, conn,
-				"select * from Test.users where id>?", func(rows *sql.Rows) (UserModel, error) {
+		stream :=FromMySqlRows[UserModel](ctx, conn,"select * from Test.users where id>?", func(rows *sql.Rows) (UserModel, error) {
+
 					var id, age int
 					var name string
 					var err error
 
 					err = rows.Scan(&id, &name, &age)
-					model := UserModel{
+
+					model := UserModel {
 						UserId:   id,
 						Age:      age,
 						UserName: name,
 					}
+
 					return model, err
+
 				}, id)
 
 		if stream.Initiated {
 			for v := range stream.FilterStream(func(model UserModel) bool {
 				return model.Age > 25
-			}).Throttle(time.Millisecond * 5000).Channel {
+			}).Throttle(time.Millisecond * 1000).Channel {
 
 				/// business logic
 
 			}
 	‌}
+
 ```
 
 
