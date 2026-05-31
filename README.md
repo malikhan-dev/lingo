@@ -14,42 +14,36 @@
 **Expressive, Polymorphic Queries with Streaming Capabilities and a User-Friendly API, inspired by LINQ.** 
  
 ```go
-	
-		if jsonStream:= FromJsonArr[User](ctx, jsonStreamConfig.StreamConf); jsonStream.Initiated {
-	
-			   JsonData := jsonStream.FilterStream(func(c User) bool {
+	if jsonStream:= FromJsonArr[User](ctx, jsonStreamConfig.StreamConf); jsonStream.Initiated {
+		JsonData := jsonStream.FilterStream(func(c User) bool {
 					return c.ID > 0
-				})
+					})
 			
 			
-			  for v := range JsonData.Channel {
-					time.Sleep(time.Millisecond * 10)
-					fmt.Println(" value: ", v)
-			  }
-		} 
-	
-		cursor := FromMySqlRows[UserModel](ctx, conn,"select * from Test.users where id>?", func(rows *sql.Rows) (UserModel, error) {
+	for v := range JsonData.Channel {
+		time.Sleep(time.Millisecond * 10)
+		fmt.Println(" value: ", v)
+		}
+}
 
-					var id, age int
-					var name string
-					var err error
+	cursor := FromMySqlRows[UserModel](ctx, conn,"select * from Test.users where id>?", func(rows *sql.Rows) (UserModel, error){
+		var id, age int
+		var name string
+		var err error
+		err = rows.Scan(&id, &name, &age)
+		model := UserModel {
+			UserId:   id,
+			Age:      age,
+			UserName: name,
+		}
 
-					err = rows.Scan(&id, &name, &age)
+		return model, err
+	}, id)
 
-					model := UserModel {
-						UserId:   id,
-						Age:      age,
-						UserName: name,
-					}
-
-					return model, err
-
-				}, id)
-
-		if cursor.Initiated {
-			for v := range cursor.FilterStream(func(model UserModel) bool {
-				return model.Age > 25
-			}).Throttle(time.Millisecond * 1000).Channel {
+	if cursor.Initiated {
+		for v := range cursor.FilterStream(func(model UserModel) bool {
+			return model.Age > 25
+		}).Throttle(time.Millisecond * 1000).Channel {
 
 				/// business logic
 
