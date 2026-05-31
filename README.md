@@ -24,7 +24,7 @@
 		time.Sleep(time.Millisecond * 10)
 		fmt.Println(" value: ", v)
 		}
-}
+	}
 
 	cursor := FromMySqlRows[UserModel](ctx, conn,"select * from Test.users where id>?", func(rows *sql.Rows) (UserModel, error){
 		var id, age int
